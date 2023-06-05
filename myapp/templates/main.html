@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>S.O.S - Volunteer Disaster Company</title>
+  {% load static %}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .navbar {
+      background-color: #595959;
+    }
+
+    .navbar-brand {
+      font-size: 24px;
+      font-weight: bold;
+      color: #dc3545;
+    }
+
+    .navbar-nav .nav-link {
+      color: #343a40;
+    }
+
+    .jumbotron {
+        background-color: rgba(0, 0, 0, 0); /* Adjust the background color and opacity as needed */
+      color: #fff;
+      padding: 50px;
+      margin-top: 150px;
+    }
+
+    .jumbotron h1 {
+      font-size: 100px;
+      font-weight: bold;
+      margin-bottom: 50px;
+        text-align: center;
+    }
+
+    .jumbotron h2 {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .jumbotron p {
+      font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("{% static 'myapp/images/homepage.jpeg' %}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.8; /* Adjust the opacity as needed */
+      z-index: -1; /* Position the overlay behind other elements */
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.65); /* Adjust the opacity as needed */
+      z-index: -1; /* Position the overlay behind other elements */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'main' %}">S.O.S</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login' %}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'register' %}">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'request' %}">Request</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'donation' %}">Donation</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Page Content -->
+  <div class="container">
+    <div class="jumbotron">
+      <h1>S.O.S</h1>
+        <h2>Volunteer Disaster Company</h2>
+      <p>Welcome to S.O.S, a voluntary disaster company dedicated to providing assistance during times of crisis. Together, we can make a difference and help those in need. Join us in our mission to bring hope and support to affected communities.</p>
+    </div>
+  </div>
+
+  <div class="bg"></div>
+  <div class="overlay"></div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registration Form</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+    .navbar {
+      background-color: #f8f9fa;
+    }
+
+    .navbar-brand {
+      font-size: 24px;
+      font-weight: bold;
+      color: #dc3545;
+    }
+
+    .navbar-nav .nav-link {
+      color: #343a40;
+    }
+
+    .jumbotron h1 {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .jumbotron p {
+      font-size: 18px;
+    }
+
+    .container {
+          margin-top: 100px;
+    }
+  </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'main' %}">S.O.S</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'request' %}">Request</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'donation' %}">Donation</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+  <div class="container">
+    <h1>Log In</h1>
+    <form>
+      <div class="form-group">
+        <label for="phone">Phone Number:</label>
+        <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number:</label>
+        <input type="tel" class="form-control" id="phone" placeholder="___ ___ __ __" pattern="[0-9]{3} [0-9]{3} [0-9]{2} [0-9]{2}" required>
+        <small class="form-text text-muted">Please enter the phone number in the format: 123 456 78 90</small>
+      </div>
+      <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+  </div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
