@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Donation List</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+    .scrollable-table {
+      max-height: 1000px; /* Adjust the height as needed */
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  {% include 'navbar.html' %}
+
+  <div class="container">
+    <h1>Donation List</h1>
+
+    <!-- Donations Table -->
+    <div class="scrollable-table">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Donation Time</th>
+            <th>Donation Delivery Time</th>
+            <th>Donator Name</th>
+            <th>Donator Phone</th>
+            <th>Met Request ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for donation in donations %}
+            <tr>
+              <td>{{ donation.DonationTime }}</td>
+              <td>{{ donation.DonationDeliveryTime }}</td>
+              <td>{{ donation.Donator_DonatorID.name }}</td>
+              <td>{{ donation.Donator_DonatorID.phone }}</td>
+              <td>{{ donation.RequestID }}</td>
+              <td>
+                  <button class="btn btn-info" onclick="showDonatedItems('{{ donation.id }}')">View Items</button>
+                  <button class="btn btn-danger" onclick="deleteDonation({{ donation.pk }})">Delete</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Donated Items Modal -->
+  <div class="modal fade" id="donatedItemsModal" tabindex="-1" role="dialog" aria-labelledby="donatedItemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="donatedItemsModalLabel">Donated Items</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody id="donatedItemsTableBody">
+              <!-- Populated dynamically with donated items -->
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    const donatedItemsModal = document.getElementById('donatedItemsModal');
+    const donatedItemsTableBody = document.getElementById('donatedItemsTableBody');
+
+    function showDonatedItems(donationId) {
+
+      fetch(`/get_donated_items/?donation_id=${donationId}`)
+        .then(response => response.json())
+        .then(data => {
+          // Check if donated_items property exists in the response data
+          if (data.hasOwnProperty('donated_items')) {
+            const donatedItems = data.donated_items;
+
+            // Format the donated items as a string
+            let itemsString = '';
+            for (const key in donatedItems) {
+              if (donatedItems.hasOwnProperty(key)) {
+                itemsString += `${key}: ${donatedItems[key]}, `;
+              }
+            }
+            // Remove the trailing comma and whitespace
+            itemsString = itemsString.slice(0, -2);
+
+            // Display the donated items in a pop-up or any other way you prefer
+            requestDetailsElement.textContent = itemsString;
+            $('#requestDetailsModal').modal('show');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    }
+
+    function deleteDonation(donationId) {
+      // Make an AJAX request to delete the donation record
+      fetch(`/delete_donation/?donation_id=${donationId}`, { method: 'DELETE' })
+        .then(response => {
+          if (response.ok) {
+            // Reload the page after successful deletion
+            location.reload();
+          } else {
+            throw new Error('Failed to delete donation');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>

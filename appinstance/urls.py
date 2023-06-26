@@ -16,12 +16,23 @@ Including another URLconf
 """
 from django.urls import path
 from myapp import views
-from django.views.generic.base import RedirectView
+from django.contrib import admin
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('', views.main, name='main'),
-    path('login/', views.login, name='login'),
+    path('administration/', views.administration, name='administration'),
+    path('login/', views._login, name='login'),
+    path('logout/', views._logout, name='logout'),
     path('register/', views.register, name='register'),
     path('request/', views.request_page, name='request'),
     path('donation/', views.donation, name='donation'),
+    path('donation_admin/', views.donation_admin, name='donation_admin'),
+    path('procurement_admin/', views.procurement_admin, name='procurement_admin'),
+    path('request_admin/', views.request_admin, name='request_admin'),
+    path('get_request_details/', views.get_request_details, name='get_request_details'),
+    path('update_request/', views.update_request, name='update_request'),
+    path('reporting_admin/', views.reporting_admin, name='reporting_admin'),
+    path('get_donated_items/', views.get_donated_items, name='get_donated_items'),
+    path('delete_donation/', views.delete_donation, name='delete_donation')
 ]

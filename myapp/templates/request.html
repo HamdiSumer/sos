@@ -1,147 +1,138 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Donation Form</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <style>
-    .form-group.multi-select .custom-control {
-      margin-bottom: 10px;
-    }
-    .navbar {
-      background-color: #f8f9fa;
-    }
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Donation Form</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+      <style>
+        .form-group.multi-select .custom-control {
+          margin-bottom: 10px;
+        }
+        .navbar {
+          background-color: #f8f9fa;
+        }
 
-    .navbar-brand {
-      font-size: 24px;
-      font-weight: bold;
-      color: #dc3545;
-    }
-    .container {
-          margin-top: 100px;
-    }
+        .navbar-brand {
+          font-size: 24px;
+          font-weight: bold;
+          color: #dc3545;
+        }
+        .container {
+              margin-top: 100px;
+        }
 
-    .navbar-nav .nav-link {
-      color: #343a40;
-    }
+        .navbar-nav .nav-link {
+          color: #343a40;
+        }
 
-    .jumbotron h1 {
-      font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
+        .jumbotron h1 {
+          font-size: 48px;
+          font-weight: bold;
+          margin-bottom: 20px;
+        }
 
-    .jumbotron p {
-      font-size: 18px;
-    }
-  </style>
-  <script>
-    function validateForm() {
-      const items = document.querySelectorAll('.custom-control-input:checked');
-      const amounts = document.querySelectorAll('.amount-input');
-      let valid = false;
-      amounts.forEach((amount) => {
-        if (amount.value.trim() !== '') {
-          const num = parseFloat(amount.value);
-          if (num > 0) {
-            valid = true;
-          } else {
-            alert('Item amount cannot be negative.');
-            valid = false;
-            return;
+        .jumbotron p {
+          font-size: 18px;
+        }
+      </style>
+      <script>
+        function validateForm() {
+          const items = document.querySelectorAll('.custom-control-input:checked');
+          const amounts = document.querySelectorAll('.amount-input');
+          let valid = false;
+          amounts.forEach((amount) => {
+            if (amount.value.trim() !== '') {
+              const num = parseFloat(amount.value);
+              if (num > 0) {
+                valid = true;
+              } else {
+                alert('Item amount cannot be negative.');
+                valid = false;
+                return;
+              }
+            }
+          });
+          if (items.length === 0 || !valid) {
+            alert('Please select at least one item and provide its amount.');
+            return false;
           }
         }
-      });
-      if (items.length === 0 || !valid) {
-        alert('Please select at least one item and provide its amount.');
-        return false;
-      }
-    }
-  </script>
-</head>
-<body>
-<!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="{% url 'main' %}">S.O.S</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'login' %}">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'register' %}">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'request' %}">Request</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'donation' %}">Donation</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+      </script>
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+      {% include 'navbar.html' %}
 
-  <div class="container">
-      <form onsubmit="return validateForm()">
-      <h2>Request Details</h2>
-      <div class="form-group multi-select">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="category-a">
-              <label class="custom-control-label" for="category-a">Category A</label>
-              <input type="number" class="form-control amount-input" id="amount-a" placeholder="Enter the amount" disabled>
+      <div class="container">
+        <h1>Request Form</h1>
+
+        <!-- Donation Form -->
+        <form method="POST" action="{% url 'request' %} " enctype="multipart/form-data" onsubmit="return validateForm()" >
+          {% csrf_token %}
+
+          <div class="form-group multi-select">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="cash">
+                  <label class="custom-control-label" for="cash">Cash</label>
+                  <input type="number" class="form-control amount-input" id="amount-cash" name="cash" placeholder="Enter the amount" disabled>
+                    <select class="form-control currencyBox" id="currency" name="currency" required disabled>
+                        {% for currency in currencies %}
+                            <option value="{{ currency.id }}">{{ currency.Name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="shelter">
+                  <label class="custom-control-label" for="shelter" >Shelter</label>
+                  <input type="number" class="form-control amount-input" id="amount-shelter" name="shelter" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="hygiene">
+                  <label class="custom-control-label" for="hygiene" >Hygiene</label>
+                  <input type="number" class="form-control amount-input" id="amount-hygiene" name="hygiene" placeholder="Enter the amount" disabled>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="food">
+                  <label class="custom-control-label" for="food" >Food</label>
+                  <input type="number" class="form-control amount-input" id="amount-food" name="food" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
             </div>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="category-b">
-              <label class="custom-control-label" for="category-b">Category B</label>
-              <input type="number" class="form-control amount-input" id="amount-b" placeholder="Enter the amount" disabled>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="clothing">
+                  <label class="custom-control-label" for="clothing" >Clothing</label>
+                  <input type="number" class="form-control amount-input" id="amount-clothing" name="clothing" placeholder="Enter the amount" disabled>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="medical">
+                  <label class="custom-control-label" for="medical" >Medical Supplies</label>
+                  <input type="number" class="form-control amount-input" id="amount-medical" name="medical" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="category-c">
-              <label class="custom-control-label" for="category-c">Category C</label>
-              <input type="number" class="form-control amount-input" id="amount-c" placeholder="Enter the amount" disabled>
-            </div>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="category-d">
-              <label class="custom-control-label" for="category-d">Category D</label>
-              <input type="number" class="form-control amount-input" id="amount-d" placeholder="Enter the amount" disabled>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="category-e">
-              <label class="custom-control-label" for="category-e">Category E</label>
-              <input type="number" class="form-control amount-input" id="amount-e" placeholder="Enter the amount" disabled>
-            </div>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="category-f">
-              <label class="custom-control-label" for="category-f">Category F</label>
-              <input type="number" class="form-control amount-input" id="amount-f" placeholder="Enter the amount" disabled>
-            </div>
-          </div>
-        </div>
+
+          <button type="submit" class="btn btn-primary">Request</button>
+        </form>
       </div>
 
-      <button type="submit" class="btn btn-primary">Donate</button>
-    </form>
-  </div>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <script>
+        const checkboxes = document.querySelectorAll('.custom-control-input');
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener('change', () => {
+            const amountInput = checkbox.parentNode.querySelector('.amount-input');
+            const currencyBox = checkbox.parentNode.querySelector('.currencyBox');
+            amountInput.disabled = !checkbox.checked;
+            currencyBox.disabled = !checkbox.checked;
+          });
+        });
 
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script>
-    const checkboxes = document.querySelectorAll('.custom-control-input');
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', () => {
-        const amountInput = checkbox.parentNode.querySelector('.amount-input');
-        amountInput.disabled = !checkbox.checked;
-      });
-    });
-  </script>
-</body>
-</html>
+      </script>
+    </body>
+    </html>

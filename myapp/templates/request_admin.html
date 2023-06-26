@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Request List</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .scrollable-table {
+      max-height: 1000px; /* Adjust the height as needed */
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  {% include 'navbar.html' %}
+
+  <div class="container">
+    <h1>Request List</h1>
+
+    <!-- Requests Table -->
+    <div class="scrollable-table">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Request Time</th>
+            <th>Current Status</th>
+            <th>Delivery Time</th>
+            <th>Victim Name</th>
+            <th>Victim Phone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in requests %}
+            <tr data-request-id="{{ request.id }}">
+              <td>{{ request.RequestTime }}</td>
+              <td>{{ request.CurrentStatus }}</td>
+              <td>{{ request.DeliveryTime }}</td>
+              <td>{{ request.Victim_RequesterID.Name }}</td>
+              <td>{{ request.Victim_RequesterID.PhoneNumber }}</td>
+              <td>
+                <button class="btn btn-info" onclick="showRequestDetails('{{ request.id }}')">View Items</button>
+                  <button class="btn btn-success send-btn" onclick="sendRequest('{{ request.id }}')">Send</button>
+                <button class="btn btn-danger delete-btn" onclick="deleteRequest({{ request.pk }})">Reject</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Request Details Modal -->
+  <div class="modal fade" id="requestDetailsModal" tabindex="-1" role="dialog" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="requestDetailsModalLabel">Request Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Display the request details dynamically here -->
+          <p id="requestDetails"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    const requestDetailsModal = document.getElementById('requestDetailsModal');
+    const requestDetailsElement = document.getElementById('requestDetails');
+
+    function showRequestDetails(requestId) {
+      fetch(`/get_request_details/?request_id=${requestId}`)
+        .then(response => response.json())
+        .then(data => {
+          // Check if request_details property exists in the response data
+          if (data.hasOwnProperty('request_details')) {
+            const requestDetails = data.request_details;
+
+            // Format the request details as a string
+            let detailsString = '';
+            for (const key in requestDetails) {
+              if (requestDetails.hasOwnProperty(key)) {
+                detailsString += `${key}: ${requestDetails[key]}, `;
+              }
+            }
+            // Remove the trailing comma and whitespace
+            detailsString = detailsString.slice(0, -2);
+
+            // Display the request details in the modal
+            requestDetailsElement.textContent = detailsString;
+            $('#requestDetailsModal').modal('show');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function deleteRequest(requestId) {
+      // Make an AJAX request to delete the request record
+      fetch(`/delete_request/?request_id=${requestId}`, { method: 'DELETE' })
+        .then(response => {
+          if (response.ok) {
+            // Reload the page after successful deletion
+            location.reload();
+          } else {
+            throw new Error('Failed to delete request');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function handleSendRequestSuccess(requestId) {
+      // Find the corresponding row by request ID
+      const row = document.querySelector(`tr[data-request-id="${requestId}"]`);
+
+      location.reload();
+    }
+
+    function sendRequest(requestId) {
+      fetch(`/update_request/?request_id=${requestId}`, { method: 'UPDATE' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.disable_buttons) {
+            handleSendRequestSuccess(data.request_id);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+
+    // Function to check if the buttons should be disabled based on the CurrentStatus value
+    function disableButtonsForRow(row) {
+      const buttons = row.querySelectorAll('.send-btn, .delete-btn');
+      buttons.forEach(button => {
+        button.disabled = true;
+      });
+    }
+
+    function checkButtonDisabledState(requestId) {
+      const row = document.querySelector(`tr[data-request-id="${requestId}"]`);
+      const currentStatus = row.querySelector('td:nth-child(2)').textContent.trim();
+
+      if (currentStatus !== 'Incomplete') {
+        disableButtonsForRow(row);
+      }
+    }
+
+    // Call the function for each request row
+    const requestRows = document.querySelectorAll('tr[data-request-id]');
+    requestRows.forEach(row => {
+      const requestId = row.getAttribute('data-request-id');
+      checkButtonDisabledState(requestId);
+    });
+  </script>
+</body>
+</html>
