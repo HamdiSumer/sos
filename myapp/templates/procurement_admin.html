@@ -1,0 +1,371 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Procurement Form</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+      <style>
+        .form-group.multi-select .custom-control {
+          margin-bottom: 10px;
+        }
+        .navbar {
+          background-color: #f8f9fa;
+        }
+
+        .navbar-brand {
+          font-size: 24px;
+          font-weight: bold;
+          color: #dc3545;
+        }
+
+        .navbar-nav .nav-link {
+          color: #343a40;
+        }
+
+        .jumbotron h1 {
+          font-size: 48px;
+          font-weight: bold;
+          margin-bottom: 20px;
+        }
+        .container {
+            margin-top: 100px;
+        }
+
+        .jumbotron p {
+          font-size: 18px;
+        }
+
+        .col-md-6 {
+            margin: 10px;
+            width: 400px;
+        }
+
+        .inv_container{
+            margin-bottom: 100px;
+        }
+
+        .proc_table{
+            max-height: 200px;
+        }
+
+        .btn{
+            margin-top: 10px;
+        }
+
+
+        .alert_cl{
+            margin-right: 300px;
+        }
+
+        .row.flex-row {
+          display: flex;
+          flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            margin-left: -300px;
+            margin-right: -300px;
+        }
+
+
+          </style>
+      <script>
+        function validateForm() {
+          const items = document.querySelectorAll('.custom-control-input:checked');
+          const amounts = document.querySelectorAll('.amount-input');
+          let valid = false;
+          amounts.forEach((amount) => {
+            if (amount.value.trim() !== '') {
+              const num = parseFloat(amount.value);
+              if (num > 0) {
+                valid = true;
+              } else {
+                alert('Item amount cannot be negative.');
+                valid = false;
+                return;
+              }
+            }
+          });
+          if (items.length === 0 || !valid) {
+            alert('Please select at least one item and provide its amount.');
+            return false;
+          }
+        }
+      </script>
+    </head>
+    <body>
+      <!-- Navigation Bar -->
+      {% include 'navbar.html' %}
+
+      <div class="container">
+
+      <div class="jumbotron">
+      {% if messages %}
+        <div class="alert alert-danger alert_cl" role="alert" id="alertMessage">
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+          <h1>Purchase</h1>
+
+        <!-- Procurement form -->
+        <form method="POST" action="{% url 'procurement_admin' %} " enctype="multipart/form-data" onsubmit="return validateForm()" >
+          {% csrf_token %}
+            <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="supplier">Choose Supplier:</label>
+              <select class="form-control supplierBox" id="supplier" name="supplier" required>
+                        {% for supplier in suppliers %}
+                            <option value="{{ supplier.id }}">{{ supplier.SupplierName }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+          </div>
+
+          <h2>Purchase Details</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="shelter">
+                  <label class="custom-control-label" for="shelter">Shelter</label>
+                  <input type="number" class="form-control amount-input" id="amount-shelter" name="shelter" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="hygiene">
+                  <label class="custom-control-label" for="hygiene">Hygiene</label>
+                  <input type="number" class="form-control amount-input" id="amount-hygiene" name="hygiene" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="food">
+                  <label class="custom-control-label" for="food">Food</label>
+                  <input type="number" class="form-control amount-input" id="amount-food" name="food" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="clothing">
+                  <label class="custom-control-label" for="clothing">Clothing</label>
+                  <input type="number" class="form-control amount-input" id="amount-clothing" name="clothing" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="medical">
+                  <label class="custom-control-label" for="medical">Medical Supplies</label>
+                  <input type="number" class="form-control amount-input" id="amount-medical" name="medical" placeholder="Enter the amount" disabled>
+                </div>
+              </div>
+            </div>
+
+         <div class="form-group">
+          <span id="costEstimate" class="cost-estimate"></span>
+        </div>
+            <input type="hidden" id="costEstimateInput" name="costEstimate" value="">
+          <button type="submit" class="btn btn-primary">Order</button>
+        </form>
+      </div>
+
+        {#Inv show#}
+      <div class="row flex-row">
+      <div class="col-md-6">
+      <div class="inv_container">
+        <h1>Inventory</h1>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th class="header">Item</th>
+              <th class="header">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+              <tr>
+                <td>{{ item.ItemCategory }}</td>
+                <td>{{ item.Amount }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+    {#Procurement table#}
+      <div class="col-md-6">
+      <div class="scrollable-table proc_table">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Supplier</th>
+                <th>Transaction Cost</th>
+                  <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for purchase in purchases %}
+                <tr>
+                  <td>{{ purchase.Supplier_SupplierID.SupplierName }}</td>
+                    <td>{{ purchase.Purchase_PurchaseTransactionID.TransactionCost }}</td>
+                    <td><button class="btn btn-info" onclick="showPurchasedItems('{{ purchase.id }}')">View Items</button></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        </div>
+        </div>
+
+
+      <!-- Donation Details Modal -->
+      <div class="modal fade" id="requestDetailsModal" tabindex="-1" role="dialog" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="requestDetailsModalLabel">Donation Details</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <!-- Display the request details dynamically here -->
+              <p id="donatedItemsTableBody_det"></p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <script>
+
+         const donatedItemsModal = document.getElementById('donatedItemsModal');
+        const donatedItemsTableBody = document.getElementById('donatedItemsTableBody_det');
+      function showPurchasedItems(purchaseID) {
+
+      fetch(`/get_purchased_items/?purchase_id=${purchaseID}`)
+        .then(response => response.json())
+        .then(data => {
+
+          if (data.hasOwnProperty('proc_items')) {
+            const donatedItems = data.proc_items;
+
+            console.log(donatedItems)
+
+
+            let itemsString = '';
+            for (const key in donatedItems) {
+              if (donatedItems.hasOwnProperty(key)) {
+                itemsString += `${key}: ${donatedItems[key]}, `;
+              }
+            }
+
+            itemsString = itemsString.slice(0, -2);
+
+            donatedItemsTableBody.innerHTML  = itemsString;
+
+            $('#requestDetailsModal').modal('show');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+
+
+
+        const checkboxes = document.querySelectorAll('.custom-control-input');
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener('change', () => {
+            const amountInput = checkbox.parentNode.querySelector('.amount-input');
+            const currencyBox = checkbox.parentNode.querySelector('.currencyBox');
+            amountInput.disabled = !checkbox.checked;
+            currencyBox.disabled = !checkbox.checked;
+          });
+        });
+
+
+
+         // Get references to the required elements
+      const supplierSelect = document.getElementById('supplier');
+      const amountInputs = document.querySelectorAll('.amount-input');
+      const costEstimateElement = document.getElementById('costEstimate');
+
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener('change', updateCostEstimate);
+        });
+
+        amountInputs.forEach((input) => {
+          input.addEventListener('change', updateCostEstimate);
+        });
+
+        supplierSelect.addEventListener('change', updateCostEstimate);
+
+          // Define the item prices for each supplier
+          const itemPrices = [
+            {itemId: 'shelter', price: 594 },
+            {itemId: 'hygiene', price: 83 },
+            {itemId: 'food', price: 38 },
+            {itemId: 'clothing', price: 343 },
+            {itemId: 'medical', price: 232 }
+          ];
+
+          // Define the supplier rates
+          const supplierRates = [
+            { supplierId: '1', rate: 0.92 },
+            { supplierId: '2', rate: 1.13 },
+            { supplierId: '3', rate: 1.34 },
+            { supplierId: '4', rate: 1.52 },
+            { supplierId: '5', rate: 1.35 },
+            { supplierId: '6', rate: 1.46 },
+          ];
+
+          function updateCostEstimate() {
+            const supplierId = supplierSelect.value;
+            const supplierRate = supplierRates.find(supplier => supplier.supplierId === supplierId)?.rate || 1;
+
+            let costEstimate = 0;
+
+            amountInputs.forEach(input => {
+              if (!input.disabled) {
+                const itemId = input.id.replace('amount-', '');
+                const itemPrice = itemPrices.find(item => item.itemId === itemId)?.price;
+                console.log(itemId)
+                console.log(itemPrice)
+
+                if (itemPrice) {
+                  const itemAmount = parseInt(input.value);
+                  console.log(itemAmount)
+                    console.log(itemPrice)
+                    console.log(supplierRate)
+                  costEstimate += itemAmount * itemPrice * supplierRate;
+                }
+              }
+
+            });
+
+            if (isNaN(costEstimate)) {
+                costEstimateElement.textContent = 'Add Items & Choose Supplier for Cost Estimation';
+              } else {
+                costEstimateElement.textContent = 'Cost Estimate: ' + costEstimate.toFixed(2) + ' TL';
+              }
+
+            const costEstimateInput = document.getElementById('costEstimateInput');
+            costEstimateInput.value = isNaN(costEstimate) ? '' : costEstimate.toFixed(2);
+          }
+            setTimeout(function() {
+                var alertMessage = document.getElementById('alertMessage');
+                alertMessage.style.display = 'none';
+            }, 1200);
+      </script>
+    </body>
+    </html>

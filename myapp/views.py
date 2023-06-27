@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import Victim, District, Donator, Donation, Request, Items, \
-    DonationHasItems, RequestHasItems, Currency
+    DonationHasItems, RequestHasItems, Currency, DonationHasCurrency, Supplier, Purchase, PurchaseHasSupplier, \
+    PurchaseHasItems
 import datetime
 from datetime import timedelta
 import random
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from myapp.utils import request_determiner
+from django.contrib import messages
 
 
 def main(request):
@@ -89,7 +90,6 @@ def register(request):
         # Create a new Victim object and assign the user
         victim = Victim(Name=name, Surname=surname, Address=address, PhoneNumber=phone,
                         District_DistrictID=selected_object)
-        victim.save()
 
         # Assign the user to the Victim object
         victim.user = user
@@ -125,7 +125,7 @@ def donation(request):
                 donated_amounts.append(request.POST.get(i))
 
         # save donation data
-        def _don(donator=None):
+        def _don(donator=None, currency=None):
             start_date = datetime.datetime.now()
             end_date = start_date + timedelta(days=20)
             random_date = start_date + (end_date - start_date) * random.random()
@@ -148,6 +148,15 @@ def donation(request):
                                        Items_ItemID=item,
                                        Quantity=quantity)
                 don.save()
+
+                if item_name == 'cash':
+                    curr = Currency.objects.get(id=currency)
+
+                    _currency = DonationHasCurrency(Donation_DonationID=donation,
+                                                   Currency_CurrencyType=curr.Name,
+                                                   Amount=quantity)
+
+                    _currency.save()
 
             # check if donation is same as request row
             donation_items = DonationHasItems.objects.filter(Donation_DonationID=donation)
@@ -205,17 +214,17 @@ def donation(request):
                 _donator = Donator(Name=name, Surname=surname, Phone=phone)
                 _donator.save()
 
-                _don(_donator)
+                _don(_donator, currency)
         else:
             if (name is None) & (surname is None):
                 # dont save the donator, anonym
-                _don()
+                _don(currency=currency)
             else:
                 # save the donator
                 _donator = Donator(Name=name, Surname=surname, Phone=phone)
                 _donator.save()
 
-                _don(_donator)
+                _don(_donator, currency)
 
     return render(request, 'donation.html', {'currencies': currencies})
 
@@ -223,6 +232,11 @@ def donation(request):
 def donation_admin(request):
     donations = Donation.objects.all()
     return render(request, 'donation_admin.html', {'donations': donations})
+
+
+def inventory_admin(request):
+    items = Items.objects.all()
+    return render(request, 'inventory.html', {'items': items})
 
 
 def get_donated_items(request):
@@ -245,7 +259,101 @@ def get_donated_items(request):
 
 
 def procurement_admin(request):
-    return render(request, 'procurement_admin.html')
+    suppliers = Supplier.objects.all()
+    items = Items.objects.all()
+    purchases = PurchaseHasSupplier.objects.all()
+
+    # request tamamlama kontrolü de yap!!!!! yukarıda kaldı o
+
+    if request.method == 'POST':
+        # inventory cash controlü yetiyor mu? estimated price'ı bunun içine gönder
+        cost_estimate = float(request.POST.get('costEstimate'))
+        supID = int(request.POST.get('supplier'))
+        supplier = Supplier.objects.get(id=supID)
+        inv_cash = items.get(ItemCategory='cash')
+
+        itemPrices = {
+            'shelter': 594,
+            'hygiene': 83,
+            'food': 38,
+            'clothing': 343,
+            'medical': 232
+        }
+
+        supplierRates = {
+            1: 0.92,
+            2: 1.13,
+            3: 1.34,
+            4: 1.52,
+            5: 1.35,
+            6: 1.46,
+        }
+
+        if cost_estimate <= inv_cash.Amount:
+            # we have enough money
+
+            pur = Purchase(TransactionCost=cost_estimate)
+            pur.save()
+
+            pur_HS = PurchaseHasSupplier(Purchase_PurchaseTransactionID=pur,
+                                         Supplier_SupplierID=supplier)
+
+            pur_HS.save()
+
+            inv_cash.Amount = inv_cash.Amount - cost_estimate
+            inv_cash.save()
+
+            items_list = ['cash', 'shelter', 'hygiene', 'food', 'clothing', 'medical']
+
+            ordered_items = []
+            ordered_amounts = []
+
+            for i in request.POST:
+                if i in items_list:
+                    ordered_items.append(i)
+                    ordered_amounts.append(request.POST.get(i))
+
+            # update database after order completed
+            for _item in range(len(ordered_items)):
+                item_category = Items.objects.get(ItemCategory=ordered_items[_item])
+                item_category.Amount += int(ordered_amounts[_item])
+                item_category.save()
+
+                item_raw_cost = itemPrices[item_category.ItemCategory]
+                sup_Rate = supplierRates[supID]
+
+                item_cost = item_raw_cost * sup_Rate
+
+                pur_HI = PurchaseHasItems(Purchase_PurchaseTransactionID=pur,
+                                          Items_ItemID=item_category,
+                                          Amount=ordered_amounts[_item],
+                                          UnitItemCost=item_cost)
+                pur_HI.save()
+
+        else:
+            # give alert not enough money!
+            messages.error(request, "Not enough money in the inventory.")
+
+    return render(request, 'procurement_admin.html', {'suppliers': suppliers, 'items': items, 'purchases': purchases})
+
+
+def get_purchased_items(request):
+    purchase_id = request.GET.get('purchase_id')
+    proc_has_items = PurchaseHasItems.objects.filter(Purchase_PurchaseTransactionID=purchase_id)
+
+    bought_item_dict = {}
+
+    for i in proc_has_items:
+        item = Items.objects.get(id=i.Items_ItemID_id)
+        bought_item_dict[f'{item.ItemCategory}'] = i.Amount
+
+    # Construct the JSON response
+    response_data = {
+        'proc_id': purchase_id,
+        'proc_items': bought_item_dict
+    }
+
+    return JsonResponse(response_data)
 
 
 def reporting_admin(request):
@@ -277,17 +385,59 @@ def get_request_details(request):
 
 
 @csrf_exempt
+def delete_request(request):
+    if request.method == 'DELETE':
+        request_id = request.GET.get('request_id')
+
+        try:
+            request = Request.objects.get(pk=request_id)
+            request.delete()
+            return JsonResponse({'message': 'Request deleted successfully'})
+        except Donation.DoesNotExist:
+            return JsonResponse({'message': 'Request not found'}, status=404)
+
+    return JsonResponse({'message': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
 def update_request(request):
     if request.method == 'UPDATE':
         request_id = request.GET.get('request_id')
 
         request = Request.objects.get(pk=request_id)
 
-        request.CurrentStatus = 'Preparing...'
+        # check whether we can met
+        req_items = RequestHasItems.objects.filter(Request_RequestID=request_id)
 
-        request_determiner(request)
+        for _item in req_items:
+            item = Items.objects.get(ItemCategory=_item.Items_ItemID.ItemCategory)
+
+            if _item.Quantity <= item.Amount:
+                continue
+            else:
+                response_data = {
+                    'request_id': request_id,
+                    'disable_buttons': False
+                }
+                return JsonResponse(response_data)
+
+        request.CurrentStatus = 'Completed'
+
+        start_date = request.RequestTime + timedelta(days=5)
+        end_date = start_date + timedelta(days=30)
+        random_date = start_date + (end_date - start_date) * random.random()
+
+        request.DeliveryTime = random_date
 
         request.save()
+
+
+
+        # update database after request completed
+        for _item in req_items:
+            item_category = Items.objects.get(ItemCategory=_item.Items_ItemID.ItemCategory)
+            item_category.Amount -= _item.Quantity
+            item_category.save()
 
         response_data = {
             'request_id': request_id,
@@ -295,7 +445,6 @@ def update_request(request):
         }
 
         return JsonResponse(response_data)
-
 
 
 def request_page(request):

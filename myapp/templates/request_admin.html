@@ -8,6 +8,10 @@
       max-height: 1000px; /* Adjust the height as needed */
       overflow-y: auto;
     }
+
+    .container {
+        max-width: 1200px;
+    }
   </style>
 </head>
 <body>
@@ -27,6 +31,7 @@
             <th>Delivery Time</th>
             <th>Victim Name</th>
             <th>Victim Phone</th>
+            <th>District</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -38,6 +43,7 @@
               <td>{{ request.DeliveryTime }}</td>
               <td>{{ request.Victim_RequesterID.Name }}</td>
               <td>{{ request.Victim_RequesterID.PhoneNumber }}</td>
+              <td>{{ request.Victim_RequesterID.District_DistrictID.DistrictName }}</td>
               <td>
                 <button class="btn btn-info" onclick="showRequestDetails('{{ request.id }}')">View Items</button>
                   <button class="btn btn-success send-btn" onclick="sendRequest('{{ request.id }}')">Send</button>
@@ -148,8 +154,9 @@
       const row = document.querySelector(`tr[data-request-id="${requestId}"]`);
       const currentStatus = row.querySelector('td:nth-child(2)').textContent.trim();
 
-      if (currentStatus !== 'Incomplete') {
+      if (currentStatus === 'Completed') {
         disableButtonsForRow(row);
+        row.classList.add('completed-row');
       }
     }
 

@@ -8,6 +8,10 @@
       max-height: 1000px; /* Adjust the height as needed */
       overflow-y: auto;
     }
+
+    .container {
+        max-width: 1200px;
+    }
   </style>
 </head>
 <body>
@@ -79,38 +83,60 @@
     </div>
   </div>
 
+  <!-- Donation Details Modal -->
+  <div class="modal fade" id="requestDetailsModal" tabindex="-1" role="dialog" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="requestDetailsModalLabel">Donation Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Display the request details dynamically here -->
+          <p id="donatedItemsTableBody_det"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script>
     const donatedItemsModal = document.getElementById('donatedItemsModal');
-    const donatedItemsTableBody = document.getElementById('donatedItemsTableBody');
+    const donatedItemsTableBody = document.getElementById('donatedItemsTableBody_det');
 
     function showDonatedItems(donationId) {
 
       fetch(`/get_donated_items/?donation_id=${donationId}`)
         .then(response => response.json())
         .then(data => {
-          // Check if donated_items property exists in the response data
+
           if (data.hasOwnProperty('donated_items')) {
             const donatedItems = data.donated_items;
 
-            // Format the donated items as a string
+
             let itemsString = '';
             for (const key in donatedItems) {
               if (donatedItems.hasOwnProperty(key)) {
                 itemsString += `${key}: ${donatedItems[key]}, `;
               }
             }
-            // Remove the trailing comma and whitespace
-            itemsString = itemsString.slice(0, -2);
 
-            // Display the donated items in a pop-up or any other way you prefer
-            requestDetailsElement.textContent = itemsString;
+            itemsString = itemsString.slice(0, -2);
+            console.log(itemsString)
+            donatedItemsTableBody.innerHTML  = itemsString;
+            console.log(donatedItemsTableBody.innerHTML )
+            console.log(donatedItemsTableBody)
+
             $('#requestDetailsModal').modal('show');
           }
         })
         .catch(error => console.error('Error:', error));
-    }
     }
 
     function deleteDonation(donationId) {

@@ -17,9 +17,8 @@ class LogisticsCompany(models.Model):
     CompanyName = models.CharField(max_length=45)
     Phone = models.CharField(max_length=45)
 
-    def get_absolute_url(self):
-        pass
-        # return reverse('blog-home')
+    def __str__(self):
+        return f'{self.CompanyName}'
 
 
 class LogisticsCompanyHasDistrict(models.Model):
@@ -27,9 +26,8 @@ class LogisticsCompanyHasDistrict(models.Model):
     District_DistrictID = models.ForeignKey(District, on_delete=models.CASCADE)
     CostOfOutsource = models.DecimalField(max_digits=15, decimal_places=2)
 
-    def get_absolute_url(self):
-        pass
-        # return reverse('blog-home')
+    def __str__(self):
+        return f'{self.LogisticsCompany_CompanyID}'
 
 
 class Victim(models.Model):
@@ -38,6 +36,9 @@ class Victim(models.Model):
     Address = models.CharField(max_length=225)
     PhoneNumber = models.CharField(max_length=45)
     District_DistrictID = models.ForeignKey(District, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.Name}'
 
 
 class Request(models.Model):
@@ -53,18 +54,16 @@ class Courier(models.Model):
     Phone = models.CharField(max_length=45)
     LicenseType = models.CharField(max_length=45)
 
-    def get_absolute_url(self):
-        pass
-        # return reverse('blog-home')
+    def __str__(self):
+        return f'{self.Name}'
 
 
 class Vehicle(models.Model):
     VehicleType = models.CharField(max_length=45)
     Capacity = models.IntegerField()
 
-    def get_absolute_url(self):
-        pass
-        # return reverse('blog-home')
+    def __str__(self):
+        return f'{self.VehicleType}'
 
 
 class Donator(models.Model):
@@ -93,9 +92,8 @@ class Items(models.Model):
     ItemCategory = models.CharField(max_length=45)
     Amount = models.IntegerField()
 
-    def get_absolute_url(self):
-        pass
-        # return reverse('blog-home')
+    def __str__(self):
+        return f'{self.ItemCategory}'
 
 
 class DonationHasItems(models.Model):
@@ -149,9 +147,8 @@ class Supplier(models.Model):
     SupplierName = models.CharField(max_length=45)
     Phone = models.CharField(max_length=45)
 
-    def get_absolute_url(self):
-        pass
-        # return reverse('blog-home')
+    def __str__(self):
+        return f'{self.SupplierName}'
 
 
 class PurchaseHasSupplier(models.Model):
