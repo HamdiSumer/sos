@@ -8,6 +8,8 @@ As a database choice; sqlite has been used.
 ## http://appinstance26.pythonanywhere.com/
 
 # Used DB Model:
+
+
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/12cfc54a-7650-4b3f-8274-22b69fcd0628)
 
 This is the structure of our database on Django side. We have used DJANGO ORM to communicate between tables and insert/edit/delete them.
@@ -17,19 +19,29 @@ Purpose of this application is to reach people seeking assistance during times o
 
 # User Side
 ## Main Page
+
+
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/01725744-bb61-4233-9432-018c75a3b297)
 
 Users can register and log in to the platform.
+
+
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/fd32a4e8-8974-4661-98a4-3180e36173e3)
+
+
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/bee5dcf5-3f7e-451f-96cd-34628e9b17dc)
 
 By navigating in navbar various actions can be done which is sending request and donations.
 
 Registered & Logged in user can request the items that is provided by the company.
+
+
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/1fbcb04e-9972-470a-ba7a-de6f0bc4e2d9)
 
 
 Donations can also be made which is handled in database.
+
+
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/aa6ba685-ffb9-4995-bf75-9852f269c434)
 
 For donations there is no need to create an account and private data is not mandatory
