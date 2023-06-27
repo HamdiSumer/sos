@@ -51,4 +51,7 @@ This part is to monitor and follow the data flow. It can be reached by navigatin
 * Donation system is also working where you can donate items that increases the quantities in inventory. When cash has been donated it is multiplyed by the currency and send to the inventory as Turkish Lira.
 
 
+
 * Report system has been implemented. For this part we have used PowerBI, hence, <font color="coral"> to view the report in a dynamic way where filtering is possible log-in into the powerbi via metu mail may be required.</font> The screenshot of the report has been provided in 'report_queries' folder under 'app-instance-26' folder if it cannot be viewed. The sql queries to retrieve the required performance measure is also been provided under 'report_queries' folder.
+* The Report looks like this if you cannot enter via metu mail on power bi:
+  ![2023-06-27 22_49_58-Report Page](https://github.com/HamdiSumer/sos/assets/58032358/401e21f2-1833-4719-9145-13716a69ad3e)
