@@ -1,4 +1,4 @@
-# SOS Web Application
+# SOS Web Application Guideline
 
 For deployment the https://www.pythonanywhere.com/ has been used
 
@@ -6,6 +6,11 @@ As a database choice; sqlite has been used.
 
 # Deployed URL is as follows:
 ## http://appinstance26.pythonanywhere.com/
+
+# Used DB Model:
+![image](https://github.com/HamdiSumer/sos/assets/58032358/12cfc54a-7650-4b3f-8274-22b69fcd0628)
+
+This is the structure of our database on Django side. We have used DJANGO ORM to communicate between tables and insert/edit/delete them.
 
 Purpose of this application is to reach people seeking assistance during times of crisis.
 --
