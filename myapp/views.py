@@ -1,3 +1,5 @@
+import csv
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -7,9 +9,10 @@ from .models import Victim, District, Donator, Donation, Request, Items, \
 import datetime
 from datetime import timedelta
 import random
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.db import connection
 
 
 def main(request):
