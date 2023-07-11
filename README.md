@@ -98,11 +98,7 @@ inventory. When cash has been donated it is multiplyed by the currency and send 
 ![image](https://github.com/HamdiSumer/sos/assets/58032358/e4cee2d3-9e20-4d33-9e6e-c25f718af814)
 
 
-* Report system has been implemented. For this part we have used PowerBI, hence, <font color="coral"> to
-view the report in a dynamic way where filtering is possible log-in into the powerbi via metu mail may be required.</font> The
-screenshot of the report has been provided in 'report_queries' folder under 'app-instance-26' folder if it cannot be viewed.
-The sql queries to retrieve the required performance measure is also been provided under 'report_queries' folder.
-* The Report looks like this if you cannot enter via metu mail on power bi:
+* Report system has been implemented. For this part we have used PowerBI
 
 
  ![image](https://github.com/HamdiSumer/sos/assets/58032358/9937285c-7876-407d-8c5d-7c1cab0d36a7)
