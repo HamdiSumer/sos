@@ -1,6 +1,6 @@
 variables:
   APP_NAME: django-app
-  CI_ACCESS_TOKEN: "dckr_pat_nQatgAKBnN-jMDH53K5SShYoZUk"
+  CI_ACCESS_TOKEN: None
   DOCKER_HOST: 54.217.148.94:2375
 
 stages:
